@@ -2,6 +2,7 @@ import * as React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { TextInput, TouchableOpacity } from 'react-native';
 import * as Animatable from 'react-native-animatable';
+import {firebase} from './firebase';
 
 export default class LoginScreen extends React.Component {
 
@@ -16,13 +17,36 @@ export default class LoginScreen extends React.Component {
         errMsg: ""
     }
 
-    onLogin = () => {
-        if (this.state.username == 'cristina' && this.state.password == '123') {
+    onLogin = async () => {
+
+        let result = await firebase.auth().signInWithEmailAndPassword(this.state.username, this.state.password).catch(function(error){
+            // Handle Errors here.
+            var errorCode = error.code;
+            var errorMessage = error.message;
+            // ...
+            this.validateInput.current.shake(800)
+            this.setState({ errMsg: 'Usuário não encontrado. Tente novamente!' })
+          })
+          .catch((error) => {
+              console.log(error)
+              return false
+          })
+
+        if(result){
+            this.props.navigation.navigate('Menu')
+        }else{
+            this.validateInput.current.shake(800)
+            this.setState({ errMsg: 'Usuário não encontrado. Tente novamente!' })
+        }
+
+        console.log('This is login result', result)
+
+       /* if (this.state.username == 'cristina' && this.state.password == '123') {
             this.props.navigation.navigate('Menu')
         } else {
             this.validateInput.current.shake(800)
             this.setState({ errMsg: 'Usuário não encontrado. Tente novamente!' })
-        }
+        } */
     }
     render() {
         return (
